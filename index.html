@@ -288,15 +288,49 @@ const ALL_DATA = {
     {s:"Krogårdskolen",k:"Greve",so:3.8,fa:3.6},
     {s:"Mosedeskolen",k:"Greve",so:4.0,fa:3.7},
     {s:"Strandskolen",k:"Greve",so:3.8},
-    {s:"Tune Skole",k:"Greve",so:3.8}
+    {s:"Tjørnelyskolen",k:"Greve",so:3.7,fa:3.4},
+    {s:"Tune Skole",k:"Greve",so:3.8},
+    {s:"Børnecenter Hvidborg",k:"Hvidovre",so:null,fa:null},
+    {s:"Den Specialpædagogiske Dagbehandlingsinstitution Sputnik 8 ApS",k:"Hvidovre",so:null,fa:null},
+    {s:"Den Specialpædagogiske Dagbehandlingsinstitution Sputnik SP 5 ApS",k:"Greve",so:null,fa:null}
   ]
 };
 
-// Generate historical data
+// Generate historical data for Tjørnelyskolen
+const BASE_DATA_2024 = [
+  {s:"Avedøre Skole",k:"Hvidovre",so:3.8,fa:3.5},
+  {s:"Dansborgskolen",k:"Hvidovre",so:3.8,fa:3.5},
+  {s:"Engstrandskolen",k:"Hvidovre",so:3.8,fa:3.5},
+  {s:"Frydenhøjskolen",k:"Hvidovre",so:3.9,fa:3.6},
+  {s:"Gungehusskolen",k:"Hvidovre",so:3.9,fa:3.5},
+  {s:"Holmegårdsskolen",k:"Hvidovre",so:3.9,fa:3.5},
+  {s:"Langhøjskolen",k:"Hvidovre",so:3.9,fa:3.5},
+  {s:"Præstemoseskolen",k:"Hvidovre",so:4.0},
+  {s:"Risbjergskolen",k:"Hvidovre",so:4.0},
+  {s:"Sønderkærskolen",k:"Hvidovre",so:3.7},
+  {s:"Arenaskolen",k:"Greve",so:3.7,fa:3.5},
+  {s:"Bugtskolen",k:"Greve",so:4.3,fa:3.8},
+  {s:"Damagerskolen",k:"Greve",so:3.6,fa:3.5},
+  {s:"Hedelyskolen",k:"Greve",so:3.9,fa:3.6},
+  {s:"Holmeagerskolen",k:"Greve",so:4.0,fa:3.7},
+  {s:"Karlslunde Dagskole",k:"Greve",so:3.5,fa:3.0},
+  {s:"Karlslunde Skole",k:"Greve",so:3.8,fa:3.5},
+  {s:"Kirkemosegaard",k:"Greve",so:3.6,fa:3.3},
+  {s:"Krogårdskolen",k:"Greve",so:3.8,fa:3.6},
+  {s:"Mosedeskolen",k:"Greve",so:4.0,fa:3.7},
+  {s:"Strandskolen",k:"Greve",so:3.8},
+  {s:"Tjørnelyskolen",k:"Greve",so:3.7,fa:3.4},
+  {s:"Tune Skole",k:"Greve",so:3.8},
+  {s:"Børnecenter Hvidborg",k:"Hvidovre",so:null,fa:null},
+  {s:"Den Specialpædagogiske Dagbehandlingsinstitution Sputnik 8 ApS",k:"Hvidovre",so:null,fa:null},
+  {s:"Den Specialpædagogiske Dagbehandlingsinstitution Sputnik SP 5 ApS",k:"Greve",so:null,fa:null}
+];
+
 const YEARS = ["2020/2021","2021/2022","2022/2023","2023/2024","2024/2025"];
+
 for(let yi=0;yi<4;yi++){
   const yr=YEARS[yi];
-  ALL_DATA[yr]=ALL_DATA["2024/2025"].map(d=>{
+  ALL_DATA[yr]=BASE_DATA_2024.map(d=>{
     const drift=(Math.random()-0.5)*0.3;
     const trend=yi<4?0.05*(yi-4):0;
     return{
@@ -310,11 +344,15 @@ for(let yi=0;yi<4;yi++){
 const SKOLE_TYPER = {
   "Avedøre Skole":"folkeskole","Dansborgskolen":"folkeskole","Engstrandskolen":"folkeskole",
   "Frydenhøjskolen":"folkeskole","Gungehusskolen":"folkeskole","Holmegårdsskolen":"folkeskole",
-  "Langhøjskolen":"folkeskole","Præstemoseskolen":"folkeskole","Risbjergskolen":"folkeskole",
-  "Sønderkærskolen":"folkeskole","Arenaskolen":"folkeskole","Bugtskolen":"folkeskole",
-  "Damagerskolen":"folkeskole","Hedelyskolen":"folkeskole","Holmeagerskolen":"folkeskole",
-  "Karlslunde Dagskole":"folkeskole","Karlslunde Skole":"folkeskole","Kirkemosegaard":"folkeskole",
-  "Krogårdskolen":"folkeskole","Mosedeskolen":"folkeskole","Strandskolen":"folkeskole","Tune Skole":"folkeskole"
+  "Langhøjskolen":"folkeskole","Risbjergskolen":"folkeskole","Sønderkærskolen":"folkeskole",
+  "Præstemoseskolen":"privatskole",
+  "Børnecenter Hvidborg":"special","Den Specialpædagogiske Dagbehandlingsinstitution Sputnik 8 ApS":"special",
+  "Arenaskolen":"folkeskole","Bugtskolen":"folkeskole","Damagerskolen":"folkeskole",
+  "Hedelyskolen":"folkeskole","Holmeagerskolen":"folkeskole","Karlslunde Skole":"folkeskole",
+  "Krogårdskolen":"folkeskole","Mosedeskolen":"folkeskole","Strandskolen":"folkeskole",
+  "Tune Skole":"folkeskole","Tjørnelyskolen":"folkeskole",
+  "Karlslunde Dagskole":"privatskole","Kirkemosegaard":"privatskole",
+  "Den Specialpædagogiske Dagbehandlingsinstitution Sputnik SP 5 ApS":"special"
 };
 const TYPE_FARVE={folkeskole:"#2E7D54",privatskole:"#C9973A",special:"#C0392B"};
 const TYPE_NAVN={folkeskole:"Folkeskole",privatskole:"Privatskole",special:"Specialtilbud"};
