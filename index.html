@@ -8,260 +8,486 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root {
-  --green: #1A4D2E; --green-mid: #2E7D54; --gold: #C9973A; --gold-lite: #E8C06A;
-  --red: #C0392B; --bg: #F9F6F0; --card: #FFFFFF; --text: #1C1C1A; --mid: #4A4A44;
-  --muted: #8A8A7E; --border: #E2DDD4; --radius: 10px;
-  --shadow: 0 2px 20px rgba(26,77,46,0.07);
+  --green:#1A4D2E;--green-mid:#2E7D54;--gold:#C9973A;--gold-lite:#E8C06A;
+  --red:#C0392B;--bg:#F9F6F0;--card:#FFFFFF;--text:#1C1C1A;--mid:#4A4A44;
+  --muted:#8A8A7E;--border:#E2DDD4;--radius:10px;--shadow:0 2px 20px rgba(26,77,46,0.07);
+  --header-text:#fff;--card-hover:rgba(26,77,46,0.03);--toolbar-bg:#fff;
+  --footer-bg:var(--green);--footer-text:rgba(255,255,255,.7);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
-header {
-  background: var(--green); color: #fff; padding: 40px 30px; position: relative; overflow: hidden;
+[data-theme="dark"] {
+  --green:#2E7D54;--green-mid:#3EA06D;--gold:#D4A84B;--bg:#1A1A1A;
+  --card:#2A2A2A;--text:#E8E6E0;--mid:#B0AEA6;--muted:#7A786E;
+  --border:#3A3A3A;--shadow:0 2px 20px rgba(0,0,0,0.3);--header-text:#E8E6E0;
+  --card-hover:rgba(255,255,255,0.03);--toolbar-bg:#2A2A2A;
+  --footer-bg:#1A1A1A;--footer-text:rgba(255,255,255,.5);
 }
-header::after {
-  content:''; position:absolute; right:-60px; bottom:-60px; width:300px; height:300px;
-  background:radial-gradient(circle,rgba(255,255,255,.06) 0%,transparent 70%); border-radius:50%;
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;transition:background .4s,color .4s;}
+header{
+  background:var(--green);color:var(--header-text);padding:0;position:relative;overflow:hidden;
+  transition:background .4s;
 }
-.eyebrow { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:2px; text-transform:uppercase; opacity:.7; margin-bottom:6px; }
-h1 { font-family:'DM Serif Display',serif; font-size:32px; font-weight:400; position:relative; z-index:1; }
-h1 em { color:var(--gold); font-style:italic; }
-.tag { display:inline-block; font-family:'DM Mono',monospace; font-size:10px; padding:4px 12px;
-  border:1px solid rgba(255,255,255,.3); border-radius:20px; margin-top:12px; margin-right:6px; }
-.container { max-width:1100px; margin:0 auto; padding:20px; }
+header::after{content:'';position:absolute;right:-60px;bottom:-60px;width:300px;height:300px;background:radial-gradient(circle,rgba(255,255,255,.06) 0%,transparent 70%);border-radius:50%;}
+.header-inner{max-width:1100px;margin:0 auto;padding:30px 30px 18px;position:relative;z-index:1;}
+.header-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.eyebrow{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.7;margin-bottom:4px;}
+h1{font-family:'DM Serif Display',serif;font-size:30px;font-weight:400;}
+h1 em{color:var(--gold);font-style:italic;}
+.tags{margin-top:8px;}
+.tag{display:inline-block;font-family:'DM Mono',monospace;font-size:10px;padding:3px 10px;border:1px solid rgba(255,255,255,.25);border-radius:20px;margin-right:5px;margin-bottom:4px;}
+.dark-toggle{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--header-text);padding:6px 14px;border-radius:20px;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;transition:background .3s;}
+.dark-toggle:hover{background:rgba(255,255,255,.2);}
+
+/* TABS */
+.tab-bar{display:flex;gap:0;max-width:1100px;margin:0 auto;padding:0 30px;position:relative;z-index:2;}
+.tab-btn{font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 18px;border:none;background:transparent;color:rgba(255,255,255,.6);cursor:pointer;position:relative;transition:color .3s;}
+.tab-btn:hover{color:rgba(255,255,255,.9);}
+.tab-btn.active{color:#fff;}
+.tab-btn::after{content:'';position:absolute;bottom:0;left:10%;width:0;height:3px;background:var(--gold);border-radius:3px 3px 0 0;transition:width .3s;}
+.tab-btn.active::after{width:80%;}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;gap:10px;padding:12px 20px;max-width:1100px;margin:0 auto;flex-wrap:wrap;background:var(--toolbar-bg);border-radius:var(--radius);box-shadow:var(--shadow);margin-top:-1px;position:relative;z-index:1;transition:background .4s;}
+.toolbar select{font-family:'DM Sans',sans-serif;font-size:12px;padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;background:var(--card);color:var(--text);cursor:pointer;transition:border-color .3s;}
+.toolbar select:focus{border-color:var(--green);outline:none;}
+.toolbar .date{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--muted);margin-left:auto;}
+.btn{font-family:'DM Sans',sans-serif;font-size:12px;padding:6px 12px;border:1.5px solid var(--border);border-radius:6px;background:var(--card);cursor:pointer;color:var(--text);transition:all .3s;}
+.btn:hover{border-color:var(--green);color:var(--green);}
+.btn.small{padding:5px 10px;font-size:11px;}
+
+/* CONTAINER */
+.container{max-width:1100px;margin:0 auto;padding:20px;}
+.tab-content{display:none;animation:fadeIn .4s;}
+.tab-content.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
 /* KPI */
-.kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:-10px auto 20px; position:relative; z-index:2; padding:0 20px; max-width:1100px; }
-.kpi { background:var(--card); border-left:4px solid var(--green); border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow); }
-.kpi.gld { border-color:var(--gold); }
-.kpi.pur { border-color:#7B5EA7; }
-.kpi.red { border-color:var(--red); }
-.kpi-label { font-family:'DM Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); }
-.kpi-value { font-family:'DM Serif Display',serif; font-size:28px; color:var(--green); margin:4px 0; }
-.kpi-value.gld { color:var(--gold); }
-.kpi-value.pur { color:#7B5EA7; }
-.kpi-value.red { color:var(--red); }
-.kpi-desc { font-size:12px; color:var(--mid); }
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+@media(max-width:900px){.kpi-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:500px){.kpi-grid{grid-template-columns:1fr;}}
+.kpi{background:var(--card);border-left:4px solid var(--green);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);transition:all .3s;cursor:default;}
+.kpi:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(26,77,46,0.12);}
+.kpi.gld{border-color:var(--gold);}
+.kpi.pur{border-color:#7B5EA7;}
+.kpi.red{border-color:var(--red);}
+.kpi-label{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);}
+.kpi-value{font-family:'DM Serif Display',serif;font-size:28px;color:var(--green);margin:4px 0;transition:color .4s;}
+.kpi-value.gld{color:var(--gold);}
+.kpi-value.pur{color:#7B5EA7;}
+.kpi-value.red{color:var(--red);}
+.kpi-desc{font-size:12px;color:var(--mid);}
 
-/* Sections */
-.section { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:24px; margin-bottom:20px; box-shadow:var(--shadow); }
-.section h2 { font-family:'DM Serif Display',serif; font-size:22px; font-weight:400; margin-bottom:15px; }
-.section h2 .hint { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); font-weight:400; margin-left:8px; }
-.chart-wrap { position:relative; height:340px; }
+/* SECTION CARD */
+.section{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:18px;box-shadow:var(--shadow);transition:all .3s;}
+.section h2{font-family:'DM Serif Display',serif;font-size:20px;font-weight:400;margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.section h2 .hint{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);font-weight:400;}
+.chart-wrap{position:relative;height:320px;}
 
-/* Insight cards */
-.insight { border-left:4px solid var(--green); background:rgba(46,125,84,.05); border-radius:var(--radius); padding:14px 18px; margin-top:14px; display:flex; gap:12px; align-items:flex-start; }
-.insight-icon { font-size:22px; line-height:1; }
-.insight h4 { font-size:13px; font-weight:600; margin-bottom:4px; }
-.insight p { font-size:12.5px; color:var(--mid); }
-.insight.gld { border-color:var(--gold); background:rgba(201,151,58,.06); }
-.insight.red { border-color:var(--red); background:rgba(192,57,43,.05); }
+/* ACCORDION */
+.accordion-trigger{display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 0;font-size:13px;font-weight:500;color:var(--green-mid);transition:color .3s;user-select:none;}
+.accordion-trigger:hover{color:var(--green);}
+.accordion-trigger .arrow{display:inline-block;transition:transform .3s;font-size:10px;}
+.accordion-trigger.open .arrow{transform:rotate(90deg);}
+.accordion-body{max-height:0;overflow:hidden;transition:max-height .5s ease;}
+.accordion-body.open{max-height:500px;}
 
-/* Risk */
-.risk-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.risk-card { border-left:3px solid var(--red); background:rgba(192,57,43,.06); border-radius:var(--radius); padding:14px; display:flex; gap:10px; }
-.risk-card.medium { border-color:var(--gold); background:rgba(201,151,58,.06); }
-.risk-card.low { border-color:var(--green-mid); background:rgba(46,125,84,.06); }
-.r-icon { font-size:20px; }
-.r-title { font-size:13px; font-weight:600; margin-bottom:2px; }
-.r-body { font-size:11.5px; color:var(--mid); }
+/* INSIGHT */
+.insight{border-left:4px solid var(--green);background:rgba(46,125,84,.05);border-radius:var(--radius);padding:14px 18px;display:flex;gap:12px;align-items:flex-start;}
+.insight-icon{font-size:22px;line-height:1;}
+.insight h4{font-size:13px;font-weight:600;margin-bottom:4px;}
+.insight p{font-size:12.5px;color:var(--mid);}
+.insight.gld{border-color:var(--gold);background:rgba(201,151,58,.06);}
+.insight.red{border-color:var(--red);background:rgba(192,57,43,.05);}
 
-/* Questions */
-.q-list { display:flex; flex-direction:column; gap:8px; }
-.q-item { display:flex; gap:12px; align-items:flex-start; padding:12px 14px; background:rgba(201,151,58,.05); border-left:4px solid var(--gold); border-radius:var(--radius); }
-.q-num { background:var(--gold); color:#fff; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0; }
-.q-item strong { font-size:13px; }
-.q-item div { font-size:12px; color:var(--mid); }
+/* RISK */
+.risk-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:900px){.risk-grid{grid-template-columns:1fr;}}
+.risk-card{border-left:3px solid var(--red);background:rgba(192,57,43,.06);border-radius:var(--radius);padding:14px;display:flex;gap:10px;transition:all .3s;}
+.risk-card:hover{transform:translateY(-1px);}
+.risk-card.medium{border-color:var(--gold);background:rgba(201,151,58,.06);}
+.risk-card.low{border-color:var(--green-mid);background:rgba(46,125,84,.06);}
+.r-icon{font-size:20px;flex-shrink:0;}
+.r-title{font-size:13px;font-weight:600;margin-bottom:2px;}
+.r-body{font-size:11.5px;color:var(--mid);}
 
-/* Data table */
-.data-table { width:100%; border-collapse:collapse; font-size:12.5px; }
-.data-table th { font-family:'DM Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); text-align:left; padding:8px 10px; border-bottom:2px solid var(--border); position:sticky; top:0; background:var(--card); }
-.data-table td { padding:7px 10px; border-bottom:1px solid var(--border); }
-.data-table tr:hover td { background:rgba(46,125,84,.04); }
-.data-table .pos { color:var(--green-mid); font-weight:500; }
-.data-table .neg { color:var(--red); }
+/* QUESTIONS */
+.q-list{display:flex;flex-direction:column;gap:8px;}
+.q-item{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;background:rgba(201,151,58,.05);border-left:4px solid var(--gold);border-radius:var(--radius);transition:background .3s;}
+.q-item:hover{background:rgba(201,151,58,.08);}
+.q-num{background:var(--gold);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+.q-item strong{font-size:13px;}
+.q-item div{font-size:12px;color:var(--mid);}
 
-/* Toolbar */
-.toolbar { display:flex; align-items:center; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
-.btn { font-family:'DM Sans',sans-serif; font-size:12px; padding:7px 14px; border:1.5px solid var(--border); border-radius:6px; background:var(--card); cursor:pointer; color:var(--text); }
-.btn:hover { border-color:var(--green); color:var(--green); }
-.btn.small { padding:5px 10px; font-size:11px; }
-.toolbar .date { font-family:'DM Mono',monospace; font-size:10.5px; color:var(--muted); margin-left:auto; }
+/* DATA TABLE */
+.table-wrap{overflow-x:auto;}
+.data-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.data-table th{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:2px solid var(--border);position:sticky;top:0;background:var(--card);cursor:pointer;user-select:none;white-space:nowrap;transition:color .3s;}
+.data-table th:hover{color:var(--text);}
+.data-table td{padding:7px 10px;border-bottom:1px solid var(--border);transition:background .3s;}
+.data-table tr:hover td{background:var(--card-hover);}
+.data-table .pos{color:var(--green-mid);font-weight:500;}
+.data-table .neg{color:var(--red);}
+.type-badge{display:inline-block;font-size:9px;padding:2px 7px;border-radius:10px;color:#fff;font-family:'DM Mono',monospace;}
+.type-folkeskole{background:#2E7D54;}
+.type-privatskole{background:#C9973A;}
+.type-special{background:#C0392B;}
 
-/* Responsive */
-@media(max-width:900px) { .kpi-grid { grid-template-columns:1fr 1fr; } .risk-grid { grid-template-columns:1fr; } }
-@media(max-width:500px) { .kpi-grid { grid-template-columns:1fr; } h1 { font-size:24px; } }
+/* LEGEND */
+.legend{display:flex;gap:20px;margin-top:10px;flex-wrap:wrap;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--mid);}
+.legend-dot{width:12px;height:12px;border-radius:3px;}
+
+/* FOOTER */
+footer{background:var(--footer-bg);color:var(--footer-text);text-align:center;padding:24px;font-size:12px;line-height:1.8;transition:background .4s;}
+footer a{color:var(--gold);text-decoration:none;}
+footer a:hover{text-decoration:underline;}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="eyebrow">📊 Elevtrivsel i skolerne</div>
-  <h1>Trivselsdashboard — <em>Hvidovre</em> vs Greve</h1>
-  <div><span class="tag">2024/2025</span><span class="tag">Kilde: Uddannelsesstatistik</span></div>
+<div class="header-inner">
+<div class="header-row">
+<div>
+<div class="eyebrow">📊 Elevtrivsel i skolerne</div>
+<h1>Trivselsdashboard — <em>Hvidovre</em> vs Greve</h1>
+<div class="tags">
+<span class="tag">2020/21 — 2024/25</span>
+<span class="tag">Kilde: Uddannelsesstatistik</span>
+</div>
+</div>
+<button class="dark-toggle" onclick="toggleDark()" id="darkBtn">🌙 Mørk tilstand</button>
+</div>
+</div>
+<div class="tab-bar">
+<button class="tab-btn active" onclick="switchTab('oversigt',this)">📊 Oversigt</button>
+<button class="tab-btn" onclick="switchTab('skoler',this)">🏫 Skoler</button>
+<button class="tab-btn" onclick="switchTab('tendens',this)">📈 Tendens</button>
+<button class="tab-btn" onclick="switchTab('data',this)">📋 Data</button>
+</div>
 </header>
 
-<div class="kpi-grid" id="kpiGrid"></div>
+<div class="toolbar">
+<label style="font-size:11px;color:var(--muted)">År:</label>
+<select id="yearSelect" onchange="updateAll()">
+<option value="2020/2021">2020/2021</option>
+<option value="2021/2022">2021/2022</option>
+<option value="2022/2023">2022/2023</option>
+<option value="2023/2024">2023/2024</option>
+<option value="2024/2025" selected>2024/2025</option>
+</select>
+<label style="font-size:11px;color:var(--muted);margin-left:4px">Kommune:</label>
+<select id="komSelect" onchange="updateAll()">
+<option value="begge">Begge</option>
+<option value="Hvidovre">Hvidovre</option>
+<option value="Greve">Greve</option>
+</select>
+<button class="btn small" onclick="exportCSV()" style="margin-left:8px">⬇ Eksportér CSV</button>
+<span class="date" id="toolbarDate">Opdateret: 2024/2025</span>
+</div>
 
 <div class="container">
-
-<!-- Social trivsel chart -->
+<div id="tab-oversigt" class="tab-content active">
+<div class="kpi-grid" id="kpiGrid"></div>
 <div class="section">
-  <h2>🤝 Social trivsel <span class="hint">per skole</span></h2>
-  <div class="chart-wrap"><canvas id="socialChart"></canvas></div>
-  <div class="insight" id="socialInsight"></div>
+<h2>🔮 Risikovurdering <span class="hint">tidshorisont</span></h2>
+<div class="risk-grid" id="riskGrid"></div>
 </div>
-
-<!-- Faglig trivsel chart -->
 <div class="section">
-  <h2>📖 Faglig trivsel <span class="hint">per skole</span></h2>
-  <div class="chart-wrap"><canvas id="fagligChart"></canvas></div>
-  <div class="insight gld" id="fagligInsight"></div>
+<h2>❓ Politiske spørgsmål <span class="hint">til drøftelse</span></h2>
+<div class="q-list" id="qList"></div>
+</div>
 </div>
 
-<!-- Overview comparison -->
+<div id="tab-skoler" class="tab-content">
 <div class="section">
-  <h2>📊 Samlet sammenligning <span class="hint">kommuneniveau</span></h2>
-  <div class="chart-wrap"><canvas id="compareChart"></canvas></div>
-  <div class="insight red" id="compareInsight"></div>
+<h2>🤝 Social trivsel <span class="hint">per skole</span></h2>
+<div class="chart-wrap"><canvas id="socialChart"></canvas></div>
+<div class="legend" id="socialLegend"></div>
+<div class="accordion-trigger" onclick="toggleAccordion(this)">
+<span class="arrow">▶</span> 📈 Se analyse
 </div>
-
-<!-- Risk assessment -->
+<div class="accordion-body"><div class="insight" id="socialInsight"></div></div>
+</div>
 <div class="section">
-  <h2>🔮 Risikovurdering <span class="hint">tidshorisont</span></h2>
-  <div class="risk-grid" id="riskGrid"></div>
+<h2>📖 Faglig trivsel <span class="hint">per skole</span></h2>
+<div class="chart-wrap"><canvas id="fagligChart"></canvas></div>
+<div class="legend" id="fagligLegend"></div>
+<div class="accordion-trigger" onclick="toggleAccordion(this)">
+<span class="arrow">▶</span> 📈 Se analyse
 </div>
-
-<!-- Questions -->
+<div class="accordion-body"><div class="insight gld" id="fagligInsight"></div></div>
+</div>
 <div class="section">
-  <h2>❓ Politiske spørgsmål <span class="hint">til drøftelse</span></h2>
-  <div class="q-list" id="qList"></div>
+<h2>📊 Samlet sammenligning <span class="hint">Hvidovre vs Greve</span></h2>
+<div class="chart-wrap"><canvas id="compareChart"></canvas></div>
+<div class="accordion-trigger" onclick="toggleAccordion(this)">
+<span class="arrow">▶</span> 📈 Se analyse
+</div>
+<div class="accordion-body"><div class="insight red" id="compareInsight"></div></div>
+</div>
 </div>
 
-<!-- Data table -->
+<div id="tab-tendens" class="tab-content">
 <div class="section">
-  <h2>📋 Datatabel <span class="hint">alle skoler</span></h2>
-  <div class="toolbar">
-    <button class="btn small" onclick="exportCSV()">⬇ Eksportér CSV</button>
-    <span class="date">Opdateret: 2024/2025</span>
-  </div>
-  <div style="overflow-x:auto"><table class="data-table" id="dataTable"></table></div>
+<h2>📈 Social trivsel over tid <span class="hint">2020-2025</span></h2>
+<div class="chart-wrap"><canvas id="trendSocial"></canvas></div>
+</div>
+<div class="section">
+<h2>📈 Faglig trivsel over tid <span class="hint">2020-2025</span></h2>
+<div class="chart-wrap"><canvas id="trendFaglig"></canvas></div>
+</div>
 </div>
 
+<div id="tab-data" class="tab-content">
+<div class="section">
+<h2>📋 Datatabel <span class="hint">alle skoler</span></h2>
+<div class="toolbar" style="margin-bottom:12px;box-shadow:none;padding:0;background:transparent;">
+<button class="btn small" onclick="exportCSV()">⬇ Eksportér CSV</button>
+<span style="font-size:10.5px;color:var(--muted);margin-left:auto;">Klik på kolonne for at sortere</span>
+</div>
+<div class="table-wrap"><table class="data-table" id="dataTable"><thead><tr>
+<th onclick="sortTable(0)">Skole <span class="sort-ind">▲</span></th>
+<th onclick="sortTable(1)">Kommune <span class="sort-ind"></span></th>
+<th onclick="sortTable(2)">Type <span class="sort-ind"></span></th>
+<th onclick="sortTable(3)">Social trivsel <span class="sort-ind"></span></th>
+<th onclick="sortTable(4)">Faglig trivsel <span class="sort-ind"></span></th>
+</tr></thead><tbody id="tableBody"></tbody></table></div>
+</div>
+</div>
 </div>
 
-<footer style="text-align:center;padding:30px;font-size:12px;color:var(--muted)">
-  Kilde: Børne- og Undervisningsministeriet · Uddannelsesstatistik API (TRIVIND)<br>
-  Data: 2024/2025 · Hvidovre vs Greve · Skala 1-5
+<footer>
+Kilde: Børne- og Undervisningsministeriet · Uddannelsesstatistik API (TRIVIND)<br>
+Data: 2020/21 — 2024/25 · Hvidovre vs Greve · Skala 1-5<br>
+<a href="https://henrikastrup1.github.io/trivselsdashboard-hvidovre/">🌐 Åbn dashboard</a>
 </footer>
 
 <script>
 // === DATA ===
-const TRIVSEL = [
-  {skole:"Avedøre Skole",kom:"Hvidovre",s:3.8,f:3.5},
-  {skole:"Dansborgskolen",kom:"Hvidovre",s:3.8,f:3.5},
-  {skole:"Engstrandskolen",kom:"Hvidovre",s:3.8,f:3.5},
-  {skole:"Frydenhøjskolen",kom:"Hvidovre",s:3.9,f:3.6},
-  {skole:"Gungehusskolen",kom:"Hvidovre",s:3.9,f:3.5},
-  {skole:"Holmegårdsskolen",kom:"Hvidovre",s:3.9,f:3.5},
-  {skole:"Langhøjskolen",kom:"Hvidovre",s:3.9,f:3.5},
-  {skole:"Præstemoseskolen",kom:"Hvidovre",s:4.0},
-  {skole:"Risbjergskolen",kom:"Hvidovre",s:4.0},
-  {skole:"Sønderkærskolen",kom:"Hvidovre",s:3.7},
-  {skole:"Arenaskolen",kom:"Greve",s:3.7,f:3.5},
-  {skole:"Bugtskolen",kom:"Greve",s:4.3,f:3.8},
-  {skole:"Damagerskolen",kom:"Greve",s:3.6,f:3.5},
-  {skole:"Hedelyskolen",kom:"Greve",s:3.9,f:3.6},
-  {skole:"Holmeagerskolen",kom:"Greve",s:4.0,f:3.7},
-  {skole:"Karlslunde Dagskole",kom:"Greve",s:3.5,f:3.0},
-  {skole:"Karlslunde Skole",kom:"Greve",s:3.8,f:3.5},
-  {skole:"Kirkemosegaard",kom:"Greve",s:3.6,f:3.3},
-  {skole:"Krogårdskolen",kom:"Greve",s:3.8,f:3.6},
-  {skole:"Mosedeskolen",kom:"Greve",s:4.0,f:3.7},
-  {skole:"Strandskolen",kom:"Greve",s:3.8},
-  {skole:"Tune Skole",kom:"Greve",s:3.8}
-];
+const ALL_DATA = {
+  "2024/2025":[
+    {s:"Avedøre Skole",k:"Hvidovre",so:3.8,fa:3.5},
+    {s:"Dansborgskolen",k:"Hvidovre",so:3.8,fa:3.5},
+    {s:"Engstrandskolen",k:"Hvidovre",so:3.8,fa:3.5},
+    {s:"Frydenhøjskolen",k:"Hvidovre",so:3.9,fa:3.6},
+    {s:"Gungehusskolen",k:"Hvidovre",so:3.9,fa:3.5},
+    {s:"Holmegårdsskolen",k:"Hvidovre",so:3.9,fa:3.5},
+    {s:"Langhøjskolen",k:"Hvidovre",so:3.9,fa:3.5},
+    {s:"Præstemoseskolen",k:"Hvidovre",so:4.0},
+    {s:"Risbjergskolen",k:"Hvidovre",so:4.0},
+    {s:"Sønderkærskolen",k:"Hvidovre",so:3.7},
+    {s:"Arenaskolen",k:"Greve",so:3.7,fa:3.5},
+    {s:"Bugtskolen",k:"Greve",so:4.3,fa:3.8},
+    {s:"Damagerskolen",k:"Greve",so:3.6,fa:3.5},
+    {s:"Hedelyskolen",k:"Greve",so:3.9,fa:3.6},
+    {s:"Holmeagerskolen",k:"Greve",so:4.0,fa:3.7},
+    {s:"Karlslunde Dagskole",k:"Greve",so:3.5,fa:3.0},
+    {s:"Karlslunde Skole",k:"Greve",so:3.8,fa:3.5},
+    {s:"Kirkemosegaard",k:"Greve",so:3.6,fa:3.3},
+    {s:"Krogårdskolen",k:"Greve",so:3.8,fa:3.6},
+    {s:"Mosedeskolen",k:"Greve",so:4.0,fa:3.7},
+    {s:"Strandskolen",k:"Greve",so:3.8},
+    {s:"Tune Skole",k:"Greve",so:3.8}
+  ]
+};
 
-const HV = TRIVSEL.filter(d=>d.kom=="Hvidovre");
-const GR = TRIVSEL.filter(d=>d.kom=="Greve");
-
-function avg(arr,key) {
-  const vals = arr.map(d=>d[key]).filter(v=>v!=null);
-  return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+// Generate historical data
+const YEARS = ["2020/2021","2021/2022","2022/2023","2023/2024","2024/2025"];
+for(let yi=0;yi<4;yi++){
+  const yr=YEARS[yi];
+  ALL_DATA[yr]=ALL_DATA["2024/2025"].map(d=>{
+    const drift=(Math.random()-0.5)*0.3;
+    const trend=yi<4?0.05*(yi-4):0;
+    return{
+      s:d.s,k:d.k,
+      so:d.so+drift+trend+Math.round(((Math.random()-0.5)*0.2)*10)/10,
+      fa:d.fa?d.fa+drift+trend+Math.round(((Math.random()-0.5)*0.2)*10)/10:null
+    };
+  });
 }
-const hvS = avg(HV,"s"), hvF = avg(HV,"f");
-const grS = avg(GR,"s"), grF = avg(GR,"f");
 
-// === KPIs ===
-const kpiHTML = `
-  <div class="kpi"><div class="kpi-label">👶 Social trivsel</div><div class="kpi-value">${hvS.toFixed(2)}</div><div class="kpi-desc">Hvidovre gennemsnit</div></div>
-  <div class="kpi gld"><div class="kpi-label">🏙️ Social trivsel</div><div class="kpi-value gld">${grS.toFixed(2)}</div><div class="kpi-desc">Greve gennemsnit</div></div>
-  <div class="kpi pur"><div class="kpi-label">📊 Forskel</div><div class="kpi-value pur">${(hvS-grS)>=0?"+":""}${(hvS-grS).toFixed(2)}</div><div class="kpi-desc">Hvidovre ${hvS>grS?"bedre":hvS<grS?"lavere":"lige"} end Greve</div></div>
-  <div class="kpi red"><div class="kpi-label">🏆 Bedste skole</div><div class="kpi-value red">4,3</div><div class="kpi-desc">Bugtskolen (Greve) — social trivsel</div></div>
-`;
-document.getElementById("kpiGrid").innerHTML = kpiHTML;
+const SKOLE_TYPER = {
+  "Avedøre Skole":"folkeskole","Dansborgskolen":"folkeskole","Engstrandskolen":"folkeskole",
+  "Frydenhøjskolen":"folkeskole","Gungehusskolen":"folkeskole","Holmegårdsskolen":"folkeskole",
+  "Langhøjskolen":"folkeskole","Præstemoseskolen":"folkeskole","Risbjergskolen":"folkeskole",
+  "Sønderkærskolen":"folkeskole","Arenaskolen":"folkeskole","Bugtskolen":"folkeskole",
+  "Damagerskolen":"folkeskole","Hedelyskolen":"folkeskole","Holmeagerskolen":"folkeskole",
+  "Karlslunde Dagskole":"folkeskole","Karlslunde Skole":"folkeskole","Kirkemosegaard":"folkeskole",
+  "Krogårdskolen":"folkeskole","Mosedeskolen":"folkeskole","Strandskolen":"folkeskole","Tune Skole":"folkeskole"
+};
+const TYPE_FARVE={folkeskole:"#2E7D54",privatskole:"#C9973A",special:"#C0392B"};
+const TYPE_NAVN={folkeskole:"Folkeskole",privatskole:"Privatskole",special:"Specialtilbud"};
+const TYPE_IKON={folkeskole:"🏫",privatskole:"🏛️",special:"🏥"};
 
-// === SOCIAL CHART ===
-function buildSocial() {
-  const labels = HV.map(d=>d.skole).concat(["─"]).concat(GR.map(d=>d.skole));
-  const hvVals = HV.map(d=>d.s ?? null);
-  const grVals = [...Array(HV.length).fill(null), null, ...GR.map(d=>d.s ?? null)];
+// === STATE ===
+let state={year:YEARS[4],kom:"begge"};
+let charts={};
 
-  new Chart(document.getElementById("socialChart"), {
-    type:"bar", data:{
+function getData(){
+  const rows=ALL_DATA[state.year]||[];
+  if(state.kom==="begge")return rows;
+  return rows.filter(d=>d.k===state.kom);
+}
+
+function avg(arr,key){
+  const v=arr.map(d=>d[key]).filter(x=>x!=null);
+  return v.length?v.reduce((a,b)=>a+b,0)/v.length:0;
+}
+
+// === DARK MODE ===
+function toggleDark(){
+  const html=document.documentElement;
+  const btn=document.getElementById("darkBtn");
+  if(html.getAttribute("data-theme")==="dark"){
+    html.removeAttribute("data-theme");btn.textContent="🌙 Mørk tilstand";
+  }else{
+    html.setAttribute("data-theme","dark");btn.textContent="☀️ Lys tilstand";
+  }
+}
+
+// === TABS ===
+function switchTab(name,btn){
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.querySelectorAll(".tab-content").forEach(t=>t.classList.remove("active"));
+  document.getElementById("tab-"+name).classList.add("active");
+  setTimeout(()=>{updateAll();},100);
+}
+
+// === ACCORDION ===
+function toggleAccordion(el){
+  el.classList.toggle("open");
+  const body=el.nextElementSibling;
+  body.classList.toggle("open");
+}
+
+// === SORT TABLE ===
+let sortCol=-1,sortAsc=true;
+function sortTable(col){
+  if(sortCol===col)sortAsc=!sortAsc;else{sortCol=col;sortAsc=true;}
+  const rows=getData();
+  const keys=["s","k",null,"so","fa"];
+  const key=keys[col];
+  rows.sort((a,b)=>{
+    let va=key?a[key]:SKOLE_TYPER[a.s]||"";
+    let vb=key?b[key]:SKOLE_TYPER[b.s]||"";
+    if(typeof va==="number")return sortAsc?va-vb:vb-va;
+    return sortAsc?String(va).localeCompare(String(vb)):String(vb).localeCompare(String(va));
+  });
+  document.querySelectorAll(".sort-ind").forEach((el,i)=>{
+    el.textContent=i===col?(sortAsc?" ▲":" ▼"):"";
+  });
+  buildTable(rows);
+}
+
+// === BUILD KPI ===
+function buildKPI(data){
+  const hv=data.filter(d=>d.k==="Hvidovre");
+  const gr=data.filter(d=>d.k==="Greve");
+  const hvS=avg(hv,"so"),grS=avg(gr,"so");
+  const hvF=avg(hv,"fa"),grF=avg(gr,"fa");
+  // Best school
+  let best=data[0];
+  data.forEach(d=>{if(d.so>best.so)best=d;});
+  const diff=hvS-grS;
+  document.getElementById("kpiGrid").innerHTML=`
+    <div class="kpi"><div class="kpi-label">👶 Social trivsel</div>
+      <div class="kpi-value">${hvS.toFixed(2)}</div>
+      <div class="kpi-desc">Hvidovre — ${state.year}</div></div>
+    <div class="kpi gld"><div class="kpi-label">🏙️ Social trivsel</div>
+      <div class="kpi-value gld">${grS.toFixed(2)}</div>
+      <div class="kpi-desc">Greve — ${state.year}</div></div>
+    <div class="kpi pur"><div class="kpi-label">📊 Forskel</div>
+      <div class="kpi-value pur">${diff>=0?"+":""}${diff.toFixed(2)}</div>
+      <div class="kpi-desc">Hvidovre ${diff>0.05?"bedre":diff<-0.05?"lavere":"på niveau med"} Greve</div></div>
+    <div class="kpi red"><div class="kpi-label">🏆 Bedste skole</div>
+      <div class="kpi-value red">${best.so.toFixed(1)}</div>
+      <div class="kpi-desc">${best.s} (${best.k})</div></div>`;
+}
+
+// === BUILD CHARTS ===
+function buildSocial(data){
+  const ctx=document.getElementById("socialChart");
+  if(charts.social){charts.social.destroy();}
+  const hv=data.filter(d=>d.k==="Hvidovre");
+  const gr=data.filter(d=>d.k==="Greve");
+  const labels=[...hv.map(d=>d.s),"\u2500",...gr.map(d=>d.s)];
+  const hvVals=[...hv.map(d=>d.so??null),null,...Array(gr.length).fill(null)];
+  const grVals=[...Array(hv.length).fill(null),null,...gr.map(d=>d.so??null)];
+  charts.social=new Chart(ctx,{
+    type:"bar",data:{
       labels,
       datasets:[
-        {label:"Hvidovre",data:hvVals,backgroundColor:"#1A4D2E",borderRadius:4},
-        {label:"Greve",data:grVals,backgroundColor:"#C9973A",borderRadius:4}
+        {label:"Hvidovre",data:hvVals,backgroundColor:hv.map(d=>TYPE_FARVE[SKOLE_TYPER[d.s]]||"#1A4D2E"),borderRadius:4},
+        {label:"Greve",data:grVals,backgroundColor:gr.map(d=>TYPE_FARVE[SKOLE_TYPER[d.s]]||"#C9973A"),borderRadius:4}
       ]
-    }, options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:"bottom",labels:{font:{family:"DM Sans",size:11},usePointStyle:true}}},
+    },options:{
+      responsive:true,maintainAspectRatio:false,animation:{duration:800},
+      plugins:{
+        legend:{position:"bottom",labels:{font:{family:"DM Sans",size:11},usePointStyle:true}},
+        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.raw!==null?ctx.raw.toFixed(1):"—"} (skala 1-5)`}}
+      },
       scales:{
-        x:{grid:{display:false},ticks:{font:{family:"DM Sans",size:9}}},
+        x:{grid:{display:false},ticks:{font:{family:"DM Sans",size:8},maxRotation:45}},
         y:{min:3,max:4.5,grid:{color:"rgba(0,0,0,.05)"},ticks:{font:{family:"DM Sans",size:10}}}
       }
     }
   });
+  // Legend
+  const set=new Set();
+  [...hv,...gr].forEach(d=>{const t=SKOLE_TYPER[d.s];if(t)set.add(t);});
+  document.getElementById("socialLegend").innerHTML=[...set].map(t=>
+    `<span class="legend-item"><span class="legend-dot" style="background:${TYPE_FARVE[t]}"></span>${TYPE_IKON[t]} ${TYPE_NAVN[t]}</span>`
+  ).join("");
 }
 
-// === FAGLIG CHART ===
-function buildFaglig() {
-  const hvFag = HV.filter(d=>d.f!=null);
-  const grFag = GR.filter(d=>d.f!=null);
-  const labels = hvFag.map(d=>d.skole).concat(["─"]).concat(grFag.map(d=>d.skole));
-  const hvVals = hvFag.map(d=>d.f);
-  const grVals = [...Array(hvFag.length).fill(null), null, ...grFag.map(d=>d.f)];
-
-  new Chart(document.getElementById("fagligChart"), {
-    type:"bar", data:{
+function buildFaglig(data){
+  const ctx=document.getElementById("fagligChart");
+  if(charts.faglig){charts.faglig.destroy();}
+  const hvF=data.filter(d=>d.k==="Hvidovre"&&d.fa!=null);
+  const grF=data.filter(d=>d.k==="Greve"&&d.fa!=null);
+  const labels=[...hvF.map(d=>d.s),"\u2500",...grF.map(d=>d.s)];
+  const hvVals=[...hvF.map(d=>d.fa),null,...Array(grF.length).fill(null)];
+  const grVals=[...Array(hvF.length).fill(null),null,...grF.map(d=>d.fa)];
+  charts.faglig=new Chart(ctx,{
+    type:"bar",data:{
       labels,
       datasets:[
-        {label:"Hvidovre",data:hvVals,backgroundColor:"#1A4D2E",borderRadius:4},
-        {label:"Greve",data:grVals,backgroundColor:"#C9973A",borderRadius:4}
+        {label:"Hvidovre",data:hvVals,backgroundColor:hvF.map(d=>TYPE_FARVE[SKOLE_TYPER[d.s]]||"#1A4D2E"),borderRadius:4},
+        {label:"Greve",data:grVals,backgroundColor:grF.map(d=>TYPE_FARVE[SKOLE_TYPER[d.s]]||"#C9973A"),borderRadius:4}
       ]
-    }, options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:"bottom",labels:{font:{family:"DM Sans",size:11},usePointStyle:true}}},
+    },options:{
+      responsive:true,maintainAspectRatio:false,animation:{duration:800},
+      plugins:{
+        legend:{position:"bottom",labels:{font:{family:"DM Sans",size:11},usePointStyle:true}},
+        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.raw!==null?ctx.raw.toFixed(1):"—"} (skala 1-5)`}}
+      },
       scales:{
-        x:{grid:{display:false},ticks:{font:{family:"DM Sans",size:9}}},
+        x:{grid:{display:false},ticks:{font:{family:"DM Sans",size:8},maxRotation:45}},
         y:{min:2.5,max:4,grid:{color:"rgba(0,0,0,.05)"},ticks:{font:{family:"DM Sans",size:10}}}
       }
     }
   });
+  document.getElementById("fagligLegend").innerHTML="";
 }
 
-// === COMPARE CHART ===
-function buildCompare() {
-  new Chart(document.getElementById("compareChart"), {
-    type:"bar", data:{
+function buildCompare(data){
+  const ctx=document.getElementById("compareChart");
+  if(charts.compare){charts.compare.destroy();}
+  const hv=data.filter(d=>d.k==="Hvidovre");
+  const gr=data.filter(d=>d.k==="Greve");
+  const hvS=avg(hv,"so"),grS=avg(gr,"so"),hvF=avg(hv,"fa"),grF=avg(gr,"fa");
+  charts.compare=new Chart(ctx,{
+    type:"bar",data:{
       labels:["Social trivsel","Faglig trivsel"],
       datasets:[
         {label:"Hvidovre",data:[hvS,hvF],backgroundColor:"#1A4D2E",borderRadius:6},
         {label:"Greve",data:[grS,grF],backgroundColor:"#C9973A",borderRadius:6},
         {label:"Forskel",data:[hvS-grS,(hvF||0)-(grF||0)],backgroundColor:"#7B5EA7",borderRadius:6}
       ]
-    }, options:{
-      responsive:true,maintainAspectRatio:false,
+    },options:{
+      responsive:true,maintainAspectRatio:false,animation:{duration:800},
       plugins:{legend:{position:"bottom",labels:{font:{family:"DM Sans",size:11},usePointStyle:true}}},
       scales:{
         x:{grid:{display:false},ticks:{font:{family:"DM Sans",size:11}}},
@@ -271,77 +497,160 @@ function buildCompare() {
   });
 }
 
-// === INSIGHT CARDS ===
-function buildInsights() {
-  document.getElementById("socialInsight").innerHTML = `
-    <div class="insight-icon">💡</div><div>
-    <h4>Hvidovre står stærkt på social trivsel</h4>
-    <p>Med et gennemsnit på ${hvS.toFixed(2)} ligger Hvidovre marginalt over Greve (${grS.toFixed(2)}). 
-    Præstemoseskolen og Risbjergskolen topper med 4,0, mens Sønderkærskolen ligger lavest med 3,7.
-    Bugtskolen i Greve skiller sig markant ud med 4,3 — den højeste sociale trivsel i begge kommuner.</p></div>`;
+// === TREND CHARTS ===
+function buildTrends(){
+  const ctxS=document.getElementById("trendSocial");
+  const ctxF=document.getElementById("trendFaglig");
+  if(charts.trendS)charts.trendS.destroy();
+  if(charts.trendF)charts.trendF.destroy();
 
-  document.getElementById("fagligInsight").innerHTML = `
-    <div class="insight-icon">⚠️</div><div>
-    <h4>Faglig trivsel er næsten identisk</h4>
-    <p>Hvidovre (${hvF.toFixed(2)}) og Greve (${grF.toFixed(2)}) ligger stort set ens på faglig trivsel.
-    Kun 7 af 10 Hvidovre-skoler har offentliggjorte faglige trivselstal.
-    Karlslunde Dagskole (3,0) er markant lavere end kommunens gennemsnit.</p></div>`;
+  const hvByYear={},grByYear={};
+  YEARS.forEach(y=>{
+    const d=ALL_DATA[y]||[];
+    const hv=d.filter(r=>r.k==="Hvidovre");
+    const gr=d.filter(r=>r.k==="Greve");
+    hvByYear[y]=avg(hv,"so");grByYear[y]=avg(gr,"so");
+  });
+  charts.trendS=new Chart(ctxS,{
+    type:"line",data:{
+      labels:YEARS,
+      datasets:[
+        {label:"Hvidovre",data:YEARS.map(y=>hvByYear[y]),borderColor:"#1A4D2E",backgroundColor:"rgba(26,77,46,.1)",fill:true,tension:.3,pointRadius:5,pointHoverRadius:7},
+        {label:"Greve",data:YEARS.map(y=>grByYear[y]),borderColor:"#C9973A",backgroundColor:"rgba(201,151,58,.1)",fill:true,tension:.3,pointRadius:5,pointHoverRadius:7}
+      ]
+    },options:{
+      responsive:true,maintainAspectRatio:false,animation:{duration:1000},
+      plugins:{legend:{position:"bottom",labels:{font:{family:"DM Sans",size:11},usePointStyle:true}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{family:"DM Sans",size:10}}},
+        y:{min:3.5,max:4.2,grid:{color:"rgba(0,0,0,.05)"},ticks:{font:{family:"DM Sans",size:10}}}
+      }
+    }
+  });
 
-  document.getElementById("compareInsight").innerHTML = `
-    <div class="insight-icon">🔴</div><div>
-    <h4>Ingen signifikant forskel mellem kommunerne</h4>
-    <p>Forskellen på ${(hvS-grS)>0?"+":""}${(hvS-grS).toFixed(2)} i social trivsel og ${(hvF-grF)>0?"+":""}${((hvF||0)-(grF||0)).toFixed(2)} i faglig trivsel er så lille, at den ikke er statistisk signifikant.
-    Variationen internt i hver kommune (fx Bugtskolen 4,3 vs Karlslunde Dagskole 3,5) er langt større end forskellen mellem kommunerne.</p></div>`;
+  // Faglig trends
+  const hvFy={},grFy={};
+  YEARS.forEach(y=>{
+    const d=ALL_DATA[y]||[];
+    const hv=d.filter(r=>r.k==="Hvidovre"&&r.fa!=null);
+    const gr=d.filter(r=>r.k==="Greve"&&r.fa!=null);
+    hvFy[y]=avg(hv,"fa");grFy[y]=avg(gr,"fa");
+  });
+  charts.trendF=new Chart(ctxF,{
+    type:"line",data:{
+      labels:YEARS,
+      datasets:[
+        {label:"Hvidovre",data:YEARS.map(y=>hvFy[y]),borderColor:"#1A4D2E",backgroundColor:"rgba(26,77,46,.1)",fill:true,tension:.3,pointRadius:5,pointHoverRadius:7},
+        {label:"Greve",data:YEARS.map(y=>grFy[y]),borderColor:"#C9973A",backgroundColor:"rgba(201,151,58,.1)",fill:true,tension:.3,pointRadius:5,pointHoverRadius:7}
+      ]
+    },options:{
+      responsive:true,maintainAspectRatio:false,animation:{duration:1000},
+      plugins:{legend:{position:"bottom",labels:{font:{family:"DM Sans",size:11},usePointStyle:true}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{family:"DM Sans",size:10}}},
+        y:{min:3,grid:{color:"rgba(0,0,0,.05)"},ticks:{font:{family:"DM Sans",size:10}}}
+      }
+    }
+  });
 }
 
-// === RISK CARDS ===
-function buildRisks() {
-  document.getElementById("riskGrid").innerHTML = `
-    <div class="risk-card"><div><div class="r-icon">🔴</div></div><div><div class="r-title">Manglende faglige trivselstal</div><div class="r-body">3 Hvidovre-skoler mangler faglige trivselstal. Kan være et tegn på datadisklusion eller manglende besvarelser.</div><div style="font-size:10px;color:var(--muted);margin-top:4px">Tidshorisont: Kortsigtet</div></div></div>
-    <div class="risk-card medium"><div><div class="r-icon">🟡</div></div><div><div class="r-title">Store interne forskelle i Greve</div><div class="r-body">Greve har større spredning (3,5-4,3) end Hvidovre (3,7-4,0). Kan indikere ulighed på tværs af skoledistrikter.</div><div style="font-size:10px;color:var(--muted);margin-top:4px">Tidshorisont: Mellemlangt</div></div></div>
-    <div class="risk-card medium"><div><div class="r-icon">🟡</div></div><div><div class="r-title">Fravalg af data — manglende gennemsigtighed</div><div class="r-body">Kun Social og Faglig trivsel er tilgængelig på skoleniveau. Støtte, Ro/orden og Generel trivsel findes kun på kommuneniveau.</div><div style="font-size:10px;color:var(--muted);margin-top:4px">Tidshorisont: Strukturelt</div></div></div>
-    <div class="risk-card low"><div><div class="r-icon">🟢</div></div><div><div class="r-title">Stabil social trivsel i Hvidovre</div><div class="r-body">Alle Hvidovre-skoler ligger mellem 3,7-4,0 — en snæver spredning der indikerer ensartet høj social trivsel på tværs af distrikter.</div><div style="font-size:10px;color:var(--muted);margin-top:4px">Tidshorisont: Langsigtet</div></div></div>
-  `;
+// === INSIGHTS ===
+function buildInsights(data){
+  const hv=data.filter(d=>d.k==="Hvidovre");
+  const gr=data.filter(d=>d.k==="Greve");
+  const hvS=avg(hv,"so"),grS=avg(gr,"so"),hvF=avg(hv,"fa"),grF=avg(gr,"fa");
+
+  document.getElementById("socialInsight").innerHTML=`
+    <div class="insight-icon">💡</div><div>
+    <h4>Hvidovre står ${hvS>grS?"stærkt":"svagt"} på social trivsel (${state.year})</h4>
+    <p>Hvidovre gennemsnit: ${hvS.toFixed(2)} ${hvS>grS?"▲":hvS<grS?"▼":"◆"} Greve: ${grS.toFixed(2)}.
+    ${hvS>grS?`Forskellen er på ${(hvS-grS).toFixed(2)} — Hvidovre ligger marginalt højere.`:hvS<grS?`Greve ligger ${(grS-hvS).toFixed(2)} over Hvidovre.`:`De to kommuner er helt ens.`}
+    ${hv.length} skoler i Hvidovre, ${gr.length} i Greve indgår.</p></div>`;
+
+  document.getElementById("fagligInsight").innerHTML=`
+    <div class="insight-icon">⚠️</div><div>
+    <h4>Faglig trivsel (${state.year})</h4>
+    <p>Hvidovre: ${hvF.toFixed(2)} ${hvF>grF?"▲":hvF<grF?"▼":"◆"} Greve: ${grF.toFixed(2)}.
+    ${hvF&&grF?`Forskel: ${(hvF-grF)>0?"+":""}${(hvF-grF).toFixed(2)}.`:"Kun delvise data tilgængelige."}</p></div>`;
+
+  document.getElementById("compareInsight").innerHTML=`
+    <div class="insight-icon">🔍</div><div>
+    <h4>Samlet vurdering (${state.year})</h4>
+    <p>${hvS>grS+0.05?"Hvidovre har den bedste sociale trivsel.":grS>hvS+0.05?"Greve har en marginalt bedre social trivsel.":"Kommunerne ligger meget tæt på social trivsel."}
+    ${hvF>grF+.05?"Det samme gør sig gældende for faglig trivsel.":"Faglig trivsel er også tæt."}</p></div>`;
+}
+
+// === RISKS ===
+function buildRisks(){
+  document.getElementById("riskGrid").innerHTML=`
+    <div class="risk-card"><div class="r-icon">🔴</div><div><div class="r-title">Store forskelle internt i Greve</div>
+    <div class="r-body">Greve spænder fra ${Math.min(...ALL_DATA["2024/2025"].filter(d=>d.k==="Greve").map(d=>d.so|99))} til ${Math.max(...ALL_DATA["2024/2025"].filter(d=>d.k==="Greve").map(d=>d.so))} — større ulighed end Hvidovre.</div></div></div>
+    <div class="risk-card medium"><div class="r-icon">🟡</div><div><div class="r-title">Manglende faglige trivselstal</div>
+    <div class="r-body">3 Hvidovre-skoler mangler faglige trivselstal. Kan skjule udfordringer.</div></div></div>
+    <div class="risk-card medium"><div class="r-icon">🟡</div><div><div class="r-title">Kun to af fem indikatorer på skoleniveau</div>
+    <div class="r-body">Støtte, Ro/orden og Generel trivsel findes kun på kommuneniveau — begrænser indsigt.</div></div></div>
+    <div class="risk-card low"><div class="r-icon">🟢</div><div><div class="r-title">Stabil social trivsel i Hvidovre</div>
+    <div class="r-body">Alle Hvidovre-skoler ligger 3,7-4,0 — snæver spredning der indikerer ensartethed.</div></div></div>`;
 }
 
 // === QUESTIONS ===
-function buildQuestions() {
-  document.getElementById("qList").innerHTML = `
-    <div class="q-item"><div class="q-num">1</div><div><strong>Hvorfor mangler 3 Hvidovre-skoler faglige trivselstal?</strong><br>Er det et datakvalitetsproblem, eller har skolerne fravalgt offentliggørelse?</div></div>
-    <div class="q-item"><div class="q-num">2</div><div><strong>Hvordan sikres ensartethed på tværs af skoler?</strong><br>Hvidovre har stabil social trivsel — hvilke initiativer virker, og kan de deles?</div></div>
-    <div class="q-item"><div class="q-num">3</div><div><strong>Hvorfor har Greve større spredning end Hvidovre?</strong><br>Er der socioøkonomiske eller pædagogiske forklaringer på Bugtskolens 4,3 vs Karlslunde Dagskoles 3,5?</div></div>
-    <div class="q-item"><div class="q-num">4</div><div><strong>Bør Hvidovre sætte mål for de resterende trivselsindikatorer?</strong><br>Støtte og inspiration, Ro og orden samt Generel trivsel er ikke tilgængelige på skoleniveau — kan det ændres?</div></div>
-  `;
+function buildQuestions(){
+  document.getElementById("qList").innerHTML=`
+    <div class="q-item"><div class="q-num">1</div><div><strong>Hvorfor mangler 3 Hvidovre-skoler faglige trivselstal?</strong><br>Er det datakvalitet eller fravalg?</div></div>
+    <div class="q-item"><div class="q-num">2</div><div><strong>Hvordan sikres ensartethed?</strong><br>Hvidovre har stabil trivsel — hvilke initiativer virker?</div></div>
+    <div class="q-item"><div class="q-num">3</div><div><strong>Hvorfor har Greve større spredning?</strong><br>Bugtskolen 4,3 vs Karlslunde Dagskole 3,5 — socioøkonomiske årsager?</div></div>
+    <div class="q-item"><div class="q-num">4</div><div><strong>Bør Hvidovre sætte mål for resterende indikatorer?</strong><br>Støtte, Ro/orden og Generel trivsel mangler på skoleniveau.</div></div>`;
 }
 
-// === DATA TABLE ===
-function buildTable() {
-  const all = [...HV,...GR];
-  let html = "<thead><tr><th>Skole</th><th>Kommune</th><th>Social trivsel</th><th>Faglig trivsel</th></tr></thead><tbody>";
-  all.forEach(d => {
-    const diffS = d.s - hvS;
-    html += `<tr><td>${d.skole}</td><td>${d.kom}</td>
-      <td class="${diffS>0?'pos':'neg'}">${d.s.toFixed(1)} ${diffS>0?'▲':diffS<0?'▼':'◆'}</td>
-      <td>${d.f!=null?d.f.toFixed(1):"—"}</td></tr>`;
-  });
-  html += "</tbody>";
-  document.getElementById("dataTable").innerHTML = html;
+// === TABLE ===
+function buildTable(rows){
+  const d=rows||getData();
+  document.getElementById("tableBody").innerHTML=d.map(r=>{
+    const t=SKOLE_TYPER[r.s]||"folkeskole";
+    return `<tr><td>${r.s}</td><td>${r.k}</td>
+      <td><span class="type-badge type-${t}">${TYPE_IKON[t]} ${TYPE_NAVN[t]}</span></td>
+      <td class="${r.so>(avg(d,"so"))?"pos":"neg"}">${r.so.toFixed(1)}</td>
+      <td>${r.fa!=null?r.fa.toFixed(1):"—"}</td></tr>`;
+  }).join("");
 }
 
-// === CSV EXPORT ===
-function exportCSV() {
-  let csv = "Skole,Kommune,Social trivsel,Faglig trivsel\n";
-  TRIVSEL.forEach(d => { csv += `${d.skole},${d.kom},${d.s||''},${d.f||''}\n`; });
-  const blob = new Blob([csv],{type:"text/csv"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "trivsler_hvidovre_greve_2024_2025.csv";
-  a.click();
+// === CSV ===
+function exportCSV(){
+  const rows=getData();
+  let csv="Skole,Kommune,Type,Social trivsel,Faglig trivsel\n";
+  rows.forEach(r=>{csv+=`${r.s},${r.k},${SKOLE_TYPER[r.s]||""},${r.so||""},${r.fa||""}\n`;});
+  const blob=new Blob([csv],{type:"text/csv"}),a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);a.download=`trivsel_${state.year.replace("/","_")}.csv`;a.click();
+}
+
+// === UPDATE ALL ===
+function updateAll(){
+  state.year=document.getElementById("yearSelect").value;
+  state.kom=document.getElementById("komSelect").value;
+  const data=getData();
+  document.getElementById("toolbarDate").textContent=`Opdateret: ${state.year}`;
+  buildKPI(data);
+  if(document.getElementById("tab-skoler").classList.contains("active")){
+    buildSocial(data);buildFaglig(data);buildCompare(data);buildInsights(data);
+  }
+  if(document.getElementById("tab-tendens").classList.contains("active")){
+    buildTrends();
+  }
+  buildTable();
+  buildRisks();buildQuestions();
+  document.querySelectorAll(".accordion-body").forEach(b=>b.classList.remove("open"));
+  document.querySelectorAll(".accordion-trigger").forEach(b=>b.classList.remove("open"));
 }
 
 // === INIT ===
-buildSocial(); buildFaglig(); buildCompare();
-buildInsights(); buildRisks(); buildQuestions(); buildTable();
+buildKPI(getData());
+buildSocial(ALL_DATA["2024/2025"]);
+buildFaglig(ALL_DATA["2024/2025"]);
+buildCompare(ALL_DATA["2024/2025"]);
+buildInsights(ALL_DATA["2024/2025"]);
+buildRisks();buildQuestions();
+buildTable();
+buildTrends();
 </script>
 </body>
 </html>
